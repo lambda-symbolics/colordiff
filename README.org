@@ -1,0 +1,78 @@
+#+title: Colordiff
+#+subtitle: Colorful syntax-highlighted endpoint diffs for terminals
+
+Colordiff is a Common Lisp library for rendering colorful syntax highlighted
+diffs in terminal. It produces a semantic row model for application integration
+and can render that model directly with ANSI colors.
+
+Colordiff compares complete before-and-after documents. It removes their common
+prefix and suffix, retains one surrounding context line, and renders one bounded
+middle change block. It is intentionally an endpoint viewer, not an LCS engine or
+patch generator.
+
+* Loading
+
+Colordiff depends on [[https://github.com/luciusmagn/colorlisp][ColorLisp]] and
+[[https://github.com/luciusmagn/cl-colorist][cl-colorist]]. With the systems available to ASDF:
+
+#+begin_src lisp
+(asdf:load-system "colordiff")
+#+end_src
+
+For development with Qlot:
+
+#+begin_src sh
+./script/bootstrap
+./script/check
+#+end_src
+
+* Rendering a diff
+
+#+begin_src lisp
+(let ((rows
+        (colordiff:render-diff
+         :removed-content "(defun answer () 41)"
+         :added-content "(defun answer () 42)"
+         :removed-start-line 10
+         :added-start-line 10
+         :source-path "answer.lisp")))
+  (colordiff:write-ansi rows))
+#+end_src
+
+=SOURCE-PATH= is used only for language classification. Colordiff never opens
+it. Pass =:SYNTAX-HIGHLIGHT-P NIL= to disable highlighting explicitly.
+
+Exact source coordinates are optional. When they are absent, Colordiff leaves
+line-number cells blank rather than inventing positions. =:LINE-LIMIT= bounds
+each removed or added block independently.
+
+* Semantic rows
+
+=RENDER-DIFF= returns a list of rows. By default, each row is a list of =SPAN=
+objects carrying a semantic role and display text. Roles distinguish context,
+removed and added gutters, ordinary code, elisions, and ColorLisp syntax
+categories. Diff boundaries are always computed from the original logical lines
+before display sanitization, so control-only changes remain visible.
+
+Applications with an existing styled-text model can supply =:SPAN-FUNCTION=.
+The function receives a role keyword and text and its return values are placed
+directly into the rows. =:SANITIZE-LINE-FUNCTION= similarly lets an application
+apply its own terminal-safety policy before highlighting and layout.
+
+=HIGHLIGHT-SPANS= and =HIGHLIGHT-LINES= expose the same style-neutral ColorLisp
+mapping for callers that need syntax rendering outside a diff.
+
+* ANSI output
+
+=WRITE-ANSI= writes semantic rows to a stream. =ANSI-STRING= returns the same
+presentation as a string. Both accept a Colorist color level and a replacement
+style table. Passing =:NONE= as the color level produces plain text. The final
+terminal boundary visibly escapes CSI, OSC, C0, C1, DEL, and embedded line
+controls even for spans constructed directly or returned by the standalone
+syntax helpers.
+
+* License
+
+Copyright 2026 Lambda Symbolics OÜ
+
+Licensed under COLL-Attribution. See =LICENSE.lisp= for the authoritative terms.

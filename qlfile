@@ -1,0 +1,6 @@
+ql babel 2026-01-01
+ql cffi 2026-01-01
+ql cl-ppcre 2026-01-01
+
+git cl-colorist https://github.com/luciusmagn/cl-colorist.git :ref a4b65e63f40248c091d8ccf6023ad6fef5de7f0d
+git colorlisp https://github.com/luciusmagn/colorlisp.git :ref 05a3313d52e2a2c643219a750dd5045df56c1cd7

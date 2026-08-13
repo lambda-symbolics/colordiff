@@ -12,8 +12,8 @@ patch generator.
 
 * Loading
 
-Colordiff depends on [[https://github.com/luciusmagn/colorlisp][ColorLisp]] and
-[[https://github.com/luciusmagn/cl-colorist][cl-colorist]]. With the systems available to ASDF:
+Colordiff depends on [[https://github.com/lambda-symbolics/colorlisp][ColorLisp]] and
+[[https://github.com/lambda-symbolics/cl-colorist][cl-colorist]]. With the systems available to ASDF:
 
 #+begin_src lisp
 (asdf:load-system "colordiff")

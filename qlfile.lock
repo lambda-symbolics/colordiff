@@ -16,9 +16,9 @@
   :version "ql-2025-06-22"))
 ("cl-colorist" .
  (:class qlot/source/git:source-git
-  :initargs (:remote-url "https://github.com/luciusmagn/cl-colorist.git" :ref "a4b65e63f40248c091d8ccf6023ad6fef5de7f0d")
+  :initargs (:remote-url "https://github.com/lambda-symbolics/cl-colorist.git" :ref "a4b65e63f40248c091d8ccf6023ad6fef5de7f0d")
   :version "git-a4b65e63f40248c091d8ccf6023ad6fef5de7f0d"))
 ("colorlisp" .
  (:class qlot/source/git:source-git
-  :initargs (:remote-url "https://github.com/luciusmagn/colorlisp.git" :ref "05a3313d52e2a2c643219a750dd5045df56c1cd7")
+  :initargs (:remote-url "https://github.com/lambda-symbolics/colorlisp.git" :ref "05a3313d52e2a2c643219a750dd5045df56c1cd7")
   :version "git-05a3313d52e2a2c643219a750dd5045df56c1cd7"))

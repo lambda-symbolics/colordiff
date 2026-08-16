@@ -1,14 +1,13 @@
 #+title: Colordiff
 #+subtitle: Colorful syntax-highlighted endpoint diffs for terminals
 
-Colordiff is a Common Lisp library for rendering colorful syntax highlighted
-diffs in terminal. It produces a semantic row model for application integration
-and can render that model directly with ANSI colors.
+Colordiff renders colorful syntax-highlighted diffs in a terminal. It produces
+a semantic row model for application integration and can render that model
+directly with ANSI colors.
 
-Colordiff compares complete before-and-after documents. It removes their common
-prefix and suffix, retains one surrounding context line, and renders one bounded
-middle change block. It is intentionally an endpoint viewer, not an LCS engine or
-patch generator.
+Colordiff compares complete before-and-after documents. It removes their
+common prefix and suffix, keeps one surrounding context line, and renders one
+bounded middle change block.
 
 * Loading
 
@@ -39,25 +38,30 @@ For development with Qlot:
   (colordiff:write-ansi rows))
 #+end_src
 
-=SOURCE-PATH= is used only for language classification. Colordiff never opens
-it. Pass =:SYNTAX-HIGHLIGHT-P NIL= to disable highlighting explicitly.
+=SOURCE-PATH= is used only for language classification. Pass
+=:SYNTAX-HIGHLIGHT-P NIL= to skip highlighting.
 
-Exact source coordinates are optional. When they are absent, Colordiff leaves
-line-number cells blank rather than inventing positions. =:LINE-LIMIT= bounds
-each removed or added block independently.
+Exact source coordinates are optional. When they are absent, line-number cells
+are left blank. =:LINE-LIMIT= bounds each removed or added block independently.
 
 * Semantic rows
 
 =RENDER-DIFF= returns a list of rows. By default, each row is a list of =SPAN=
-objects carrying a semantic role and display text. Roles distinguish context,
-removed and added gutters, ordinary code, elisions, and ColorLisp syntax
-categories. Diff boundaries are always computed from the original logical lines
-before display sanitization, so control-only changes remain visible.
+objects carrying a semantic role and display text. Roles distinguish:
+
+- context
+- removed and added gutters
+- ordinary code
+- elisions
+- ColorLisp syntax categories
+
+Diff boundaries are computed from the original logical lines before display
+sanitization, so control-only changes stay visible.
 
 Applications with an existing styled-text model can supply =:SPAN-FUNCTION=.
-The function receives a role keyword and text and its return values are placed
-directly into the rows. =:SANITIZE-LINE-FUNCTION= similarly lets an application
-apply its own terminal-safety policy before highlighting and layout.
+The function receives a role keyword and text; its return values are placed
+directly into the rows. =:SANITIZE-LINE-FUNCTION= lets an application apply
+its own terminal-safety policy before highlighting and layout.
 
 =HIGHLIGHT-SPANS= and =HIGHLIGHT-LINES= expose the same style-neutral ColorLisp
 mapping for callers that need syntax rendering outside a diff.

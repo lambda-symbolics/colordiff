@@ -41,8 +41,10 @@ For development with Qlot:
 =SOURCE-PATH= is used only for language classification. Pass
 =:SYNTAX-HIGHLIGHT-P NIL= to skip highlighting.
 
-Exact source coordinates are optional. When they are absent, line-number cells
-are left blank. =:LINE-LIMIT= bounds each removed or added block independently.
+Every changed row carries a line number. An absent =:REMOVED-START-LINE= or
+=:ADDED-START-LINE= inherits the other side's coordinates, and when both are
+absent the documents number from their own first line. =:LINE-LIMIT= bounds
+each removed or added block independently.
 
 * Semantic rows
 

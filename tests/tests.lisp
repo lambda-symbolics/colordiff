@@ -73,7 +73,7 @@
      "a middle replacement retains one correctly numbered context line per side")))
 
 (defun test-unknown-coordinates ()
-  "Test absent source coordinates remain absent."
+  "Test absent source coordinates fall back to document numbering."
   (let ((rows
           (render-diff
            :removed-content "old"
@@ -81,8 +81,17 @@
            :syntax-highlight-p nil)))
     (test-assert
      (equal (mapcar #'test-row-text rows)
-            '("- │ old" "+ │ new"))
-     "unknown coordinates produce unnumbered gutters")))
+            '("- 1 │ old" "+ 1 │ new"))
+     "unknown coordinates number the documents from their first line"))
+  (let ((rows
+          (render-diff
+           :removed-content (format nil "keep~%drop")
+           :removed-start-line 100
+           :syntax-highlight-p nil)))
+    (test-assert
+     (equal (mapcar #'test-row-text rows)
+            '("- 100 │ keep" "- 101 │ drop"))
+     "an absent side inherits the supplied side's coordinates")))
 
 (defun test-logical-line-endings ()
   "Test CRLF input and meaningful trailing blank logical rows."
@@ -177,7 +186,7 @@
             :syntax-highlight-p nil
             :sanitize-line-function #'string-upcase)))
     (test-assert
-     (string= "+ │ \\e[31mred\\e[0m"
+     (string= "+ 1 │ \\e[31mred\\e[0m"
               (test-row-text (first safe-rows)))
      "default sanitization visibly represents embedded terminal controls")
     (test-assert
@@ -234,8 +243,8 @@
            :span-function #'cons)))
     (test-assert
      (equal rows
-            '(((:removed-gutter . "- │ ") (:code . "old"))
-              ((:added-gutter . "+ │ ") (:code . "new"))))
+            '(((:removed-gutter . "- 1 │ ") (:code . "old"))
+              ((:added-gutter . "+ 1 │ ") (:code . "new"))))
      "SPAN-FUNCTION controls the exact returned row representation")))
 
 (defun test-ansi-rendering ()
@@ -263,7 +272,7 @@
                    (format nil ";; ~A" payload)
                    :pathname "unsafe.lisp"))
             :color-level ':none)))
-    (test-assert (string= plain (format nil "- │ old~%+ │ new~%"))
+    (test-assert (string= plain (format nil "- 1 │ old~%+ 1 │ new~%"))
                  "the :none color level writes plain terminal text")
     (test-assert (find escape colored)
                  "the :basic color level writes trusted ANSI controls")

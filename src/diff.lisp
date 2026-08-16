@@ -6,23 +6,17 @@
     (old-lines new-lines old-start-line new-start-line)
   "Return the display width needed for OLD-LINES and NEW-LINES numbers."
   (let ((largest
-          (max (or (and old-start-line
-                        (+ old-start-line (max 0 (1- (length old-lines)))))
-                   0)
-               (or (and new-start-line
-                        (+ new-start-line (max 0 (1- (length new-lines)))))
-                   0))))
+          (max (+ old-start-line (max 0 (1- (length old-lines))))
+               (+ new-start-line (max 0 (1- (length new-lines)))))))
     (max 1 (length (princ-to-string largest)))))
 
 (defun colordiff--line-number-cell (line-number width)
-  "Return LINE-NUMBER right aligned to WIDTH, or an empty cell."
-  (if line-number
-      (format nil "~V@A" width line-number)
-      (make-string width :initial-element #\Space)))
+  "Return LINE-NUMBER right aligned to WIDTH."
+  (format nil "~V@A" width line-number))
 
 (defun colordiff--line-row
     (kind text span-function &key (width 1) line-number content-spans)
-  "Return one context, removed, or added row with a semantic gutter."
+  "Return one numbered context, removed, or added row with a semantic gutter."
   (let* ((gutter-role
            (ecase kind
              (:context ':context-gutter)
@@ -34,11 +28,9 @@
              (:removed "-")
              (:added "+")))
          (gutter
-           (if line-number
-               (format nil "~A ~A │ "
-                       marker
-                       (colordiff--line-number-cell line-number width))
-               (format nil "~A │ " marker)))
+           (format nil "~A ~A │ "
+                   marker
+                   (colordiff--line-number-cell line-number width)))
          (content-role (if (eq kind ':context) ':context ':code)))
     (cons
      (funcall span-function gutter-role gutter)
@@ -71,7 +63,7 @@
                  (:added "added"))))
     (append
      (loop for index below visible-count
-           for line-number = (and start-line (+ start-line index))
+           for line-number = (+ start-line index)
            collect (colordiff--line-row
                     kind
                     (aref lines index)
@@ -81,7 +73,7 @@
                     :content-spans (and highlighted-lines
                                         (aref highlighted-lines index))))
      (when (plusp omitted)
-       (let* ((line-number (and start-line (+ start-line visible-count)))
+       (let* ((line-number (+ start-line visible-count))
               (message (format nil "… +~D more ~A line~:P" omitted noun)))
          (list
           (colordiff--line-row
@@ -107,8 +99,10 @@
 REMOVED-CONTENT and ADDED-CONTENT are complete before-and-after documents for
 one change. A NIL side denotes an absent document, so creation and removal use
 the same renderer. SOURCE-PATH is language-classification metadata only and is
-never opened. SYNTAX-LANGUAGE overrides path inference. Exact line coordinates
-remain optional rather than being fabricated.
+never opened. SYNTAX-LANGUAGE overrides path inference. Every changed row
+carries a line number: an absent start line inherits the other side's
+coordinates, and when both are absent the documents number from their own
+first line.
 
 The result is a list of rows. Each row is a list of values produced by
 SPAN-FUNCTION from a semantic role and display text. This is an endpoint viewer,
@@ -121,7 +115,11 @@ middle change block after removing the common prefix and suffix."
   (check-type line-limit (integer 1))
   (check-type sanitize-line-function function)
   (check-type span-function function)
-  (let* ((old-source (or removed-content ""))
+  (let* ((effective-removed-start
+           (or removed-start-line added-start-line 1))
+         (effective-added-start
+           (or added-start-line removed-start-line 1))
+         (old-source (or removed-content ""))
          (new-source (or added-content ""))
          (old-lines (colordiff--split-lines old-source))
          (new-lines (colordiff--split-lines new-source))
@@ -152,7 +150,7 @@ middle change block after removing the common prefix and suffix."
             old-lines new-lines prefix-length))
          (width
            (colordiff--line-number-width
-            old-lines new-lines removed-start-line added-start-line)))
+            old-lines new-lines effective-removed-start effective-added-start)))
     (if (and (= prefix-length (length old-lines))
              (= prefix-length (length new-lines)))
         (list (list (funcall span-function ':context "no textual change")))
@@ -170,11 +168,7 @@ middle change block after removing the common prefix and suffix."
                (aref old-display-lines (1- prefix-length))
                span-function
                :width width
-               :line-number
-               (or (and added-start-line
-                        (+ added-start-line prefix-length -1))
-                   (and removed-start-line
-                        (+ removed-start-line prefix-length -1)))
+               :line-number (+ effective-added-start prefix-length -1)
                :content-spans
                (or (and new-highlighted
                         (aref new-highlighted (1- prefix-length)))
@@ -184,8 +178,7 @@ middle change block after removing the common prefix and suffix."
             removed
             ':removed
             span-function
-            :start-line (and removed-start-line
-                             (+ removed-start-line prefix-length))
+            :start-line (+ effective-removed-start prefix-length)
             :width width
             :highlighted-lines
             (and old-highlighted
@@ -197,8 +190,7 @@ middle change block after removing the common prefix and suffix."
             added
             ':added
             span-function
-            :start-line (and added-start-line
-                             (+ added-start-line prefix-length))
+            :start-line (+ effective-added-start prefix-length)
             :width width
             :highlighted-lines
             (and new-highlighted
@@ -213,13 +205,8 @@ middle change block after removing the common prefix and suffix."
                (aref old-display-lines (- (length old-lines) suffix-length))
                span-function
                :width width
-               :line-number
-               (or (and added-start-line
-                        (+ added-start-line
-                           (- (length new-lines) suffix-length)))
-                   (and removed-start-line
-                        (+ removed-start-line
-                           (- (length old-lines) suffix-length))))
+               :line-number (+ effective-added-start
+                               (- (length new-lines) suffix-length))
                :content-spans
                (or (and new-highlighted
                         (aref new-highlighted

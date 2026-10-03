@@ -46,6 +46,26 @@ Every changed row carries a line number. An absent =:REMOVED-START-LINE= or
 absent the documents number from their own first line. =:LINE-LIMIT= bounds
 each removed or added block independently.
 
+* Source previews and single rows
+
+=RENDER-SOURCE= shows one document as a bounded, unnumbered preview under a
+source gutter, using the same highlighting and row model as diffs:
+
+#+begin_src lisp
+(colordiff:write-ansi
+ (colordiff:render-source "ls -la"
+                          :syntax-language (colorlisp:language-find "bash")
+                          :prompt "$ "))
+#+end_src
+
+Trailing blank lines are dropped, and lines past =:LINE-LIMIT= become one
+"+N more lines" elision row. =:PROMPT= leads the first line and indents the
+rest.
+
+=RENDER-LINE-ROW= builds one numbered context, removed, or added row exactly as
+=RENDER-DIFF= does, so an application can place its own message, such as
+"line unavailable", in line with a diff.
+
 * Semantic rows
 
 =RENDER-DIFF= returns a list of rows. By default, each row is a list of =SPAN=

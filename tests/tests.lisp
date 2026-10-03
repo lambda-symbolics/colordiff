@@ -6,6 +6,8 @@
                 #:highlight-spans
                 #:make-span
                 #:render-diff
+                #:render-line-row
+                #:render-source
                 #:span-p
                 #:span-role
                 #:span-text))
@@ -233,6 +235,74 @@
           (highlight-lines "(list 1)" :pathname "form.lisp"))
      "standalone syntax helpers expose span and row forms")))
 
+(defun test-line-row ()
+  "Test the exported row builder lines up with diff rows."
+  (test-assert
+   (equal (test-row-text (render-line-row ':removed "gone" 41 :width 3))
+          "-  41 │ gone")
+   "a row carries its marker and a right-aligned line number")
+  (test-assert
+   (equal (render-line-row ':added "new" 7
+                           :content-spans (list (cons ':elision "note"))
+                           :span-function #'cons)
+          '((:added-gutter . "+ 7 │ ") (:elision . "note")))
+   "content spans replace the text span and the width defaults to the number")
+  (test-assert
+   (handler-case
+       (progn
+         (render-line-row ':source "text" 1)
+         nil)
+     (type-error ()
+       t))
+   "only diff row kinds are accepted"))
+
+(defun test-source-preview ()
+  "Test bounded source previews, prompts, and highlighting."
+  (let ((bounded
+          (render-source (format nil "one~%two~%three~C~%~%" #\Return)
+                         :line-limit 2))
+        (prompted
+          (render-source (format nil "echo a~%echo b") :prompt "$ "))
+        (escaped
+          (render-source (format nil "~C[31mred" (code-char 27))))
+        (highlighted
+          (render-source "(defun answer () 42)" :source-path "answer.lisp")))
+    (test-assert
+     (equal (mapcar #'test-row-text bounded)
+            '("│ one" "│ two" "│ … +1 more line"))
+     "trailing blank lines are dropped and the rest is bounded with an elision")
+    (test-assert
+     (and (test-find-span ':source-gutter "│ " (first bounded))
+          (test-find-span ':code "one" (first bounded))
+          (test-find-span ':elision "… +1 more line" (third bounded)))
+     "source rows carry the source gutter, code, and elision roles")
+    (test-assert
+     (and (equal (mapcar #'test-row-text prompted)
+                 '("│ $ echo a" "│   echo b"))
+          (test-find-span ':prompt "$ " (first prompted)))
+     "a prompt leads the first line and indents the following ones")
+    (test-assert
+     (and (null (render-source ""))
+          (null (render-source (format nil "~%~%")))
+          (equal (mapcar #'test-row-text (render-source "" :prompt "$ "))
+                 '("│ $ ")))
+     "empty content renders nothing, or a bare prompt row")
+    (test-assert
+     (string= "│ \\e[31mred" (test-row-text (first escaped)))
+     "source lines are sanitized before layout")
+    (test-assert
+     (and (test-rows-contain-role-p highlighted ':syntax-keyword)
+          (not (test-rows-contain-role-p highlighted ':code)))
+     "recognized source paths produce syntax roles")
+    (test-assert
+     (handler-case
+         (progn
+           (render-source "text" :line-limit 0)
+           nil)
+       (type-error ()
+         t))
+     "LINE-LIMIT must be positive")))
+
 (defun test-custom-span-function ()
   "Test applications can receive their own span representation directly."
   (let ((rows
@@ -317,6 +387,8 @@
           test-syntax-highlighting
           test-custom-span-function
           test-ansi-rendering
-          test-invalid-bound))
+          test-invalid-bound
+          test-line-row
+          test-source-preview))
   (format t "~&~D Colordiff tests passed.~%" *test-count*)
   nil)

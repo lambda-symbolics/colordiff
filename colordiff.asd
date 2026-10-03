@@ -12,6 +12,7 @@
                              (:file "model")
                              (:file "highlighting")
                              (:file "diff")
+                             (:file "source")
                              (:file "terminal"))))
   :in-order-to ((asdf:test-op (asdf:test-op #:colordiff/tests))))
 

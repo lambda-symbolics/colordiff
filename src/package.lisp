@@ -17,6 +17,8 @@
    #:highlight-spans
    #:make-span
    #:render-diff
+   #:render-line-row
+   #:render-source
    #:sanitize-line
    #:span
    #:span-p

@@ -214,3 +214,28 @@ middle change block after removing the common prefix and suffix."
                    (and old-highlighted
                         (aref old-highlighted
                               (- (length old-lines) suffix-length))))))))))))
+
+(defun render-line-row
+    (kind text line-number
+     &key (width (length (princ-to-string line-number)))
+          content-spans
+          (span-function #'make-span))
+  "Return one numbered row of KIND for TEXT, as RENDER-DIFF builds it.
+
+KIND is :CONTEXT, :REMOVED or :ADDED. LINE-NUMBER is right aligned to WIDTH
+columns. CONTENT-SPANS, when supplied, replace the single span made from TEXT,
+so a caller can place a styled message in a row that lines up with a diff.
+TEXT is display text and is not sanitized here; WRITE-ANSI sanitizes at the
+terminal boundary."
+  (check-type kind (member :context :removed :added))
+  (check-type text string)
+  (check-type line-number (integer 0))
+  (check-type width (integer 1))
+  (check-type content-spans list)
+  (check-type span-function function)
+  (colordiff--line-row kind
+                       text
+                       span-function
+                       :width         width
+                       :line-number   line-number
+                       :content-spans content-spans))

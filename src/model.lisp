@@ -4,8 +4,8 @@
 
 (deftype span-role ()
   "A semantic role carried by one rendered terminal span."
-  '(member :plain :code :context :elision
-           :context-gutter :removed-gutter :added-gutter
+  '(member :plain :code :context :elision :prompt
+           :context-gutter :removed-gutter :added-gutter :source-gutter
            :syntax-comment :syntax-keyword :syntax-string :syntax-escape
            :syntax-number :syntax-type :syntax-function :syntax-property
            :syntax-heading :syntax-link))

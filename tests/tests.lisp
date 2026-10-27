@@ -1,4 +1,5 @@
 (defpackage #:colordiff/tests
+  (:documentation "Tests for the colordiff package.")
   (:use #:cl)
   (:import-from #:colordiff
                 #:ansi-string

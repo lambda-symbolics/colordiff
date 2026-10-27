@@ -1,4 +1,6 @@
 (defpackage #:colordiff
+  (:documentation "Render syntax-highlighted diffs and source previews as
+semantic rows and ANSI text.")
   (:use #:cl)
   (:import-from #:cl-colorist
                 #:colorize

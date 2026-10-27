@@ -9,7 +9,6 @@
                 #:render-diff
                 #:render-line-row
                 #:render-source
-                #:span-p
                 #:span-role
                 #:span-text))
 

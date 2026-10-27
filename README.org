@@ -18,13 +18,6 @@ Colordiff depends on [[https://github.com/lambda-symbolics/colorlisp][ColorLisp]
 (asdf:load-system "colordiff")
 #+end_src
 
-For development with Qlot:
-
-#+begin_src sh
-./script/bootstrap
-./script/check
-#+end_src
-
 * Rendering a diff
 
 #+begin_src lisp
@@ -96,6 +89,20 @@ style table. Passing =:NONE= as the color level produces plain text. The final
 terminal boundary visibly escapes CSI, OSC, C0, C1, DEL, and embedded line
 controls even for spans constructed directly or returned by the standalone
 syntax helpers.
+
+* Development
+
+#+begin_src sh
+./script/bootstrap
+./script/check
+./script/check --fix
+#+end_src
+
+=./script/check= runs the tests, then checks the source with
+[[https://github.com/lambda-symbolics/cheque][cheque]] as =cheque.sexp=
+configures it. =--fix= skips the tests and repairs what cheque can repair.
+cheque and its tools are development dependencies: =checks/qlfile= lists them,
+and the check installs them on first use into =~/.cache/cheque/tools/=.
 
 * License
 

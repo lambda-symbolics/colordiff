@@ -46,10 +46,10 @@
   "Test numbered removed and added rows without syntax highlighting."
   (let ((rows
           (render-diff
-           :removed-content "old value"
-           :added-content "new value"
+           :removed-content    "old value"
+           :added-content      "new value"
            :removed-start-line 41
-           :added-start-line 41
+           :added-start-line   41
            :syntax-highlight-p nil)))
     (test-assert (= 2 (length rows))
                  "a one-line replacement renders two rows")
@@ -64,10 +64,10 @@
   "Test one leading and trailing context row with exact coordinates."
   (let ((rows
           (render-diff
-           :removed-content (format nil "head~%old~%tail")
-           :added-content (format nil "head~%new~%tail")
+           :removed-content    (format nil "head~%old~%tail")
+           :added-content      (format nil "head~%new~%tail")
            :removed-start-line 10
-           :added-start-line 10
+           :added-start-line   10
            :syntax-highlight-p nil)))
     (test-assert
      (equal (mapcar #'test-row-text rows)
@@ -78,8 +78,8 @@
   "Test absent source coordinates fall back to document numbering."
   (let ((rows
           (render-diff
-           :removed-content "old"
-           :added-content "new"
+           :removed-content    "old"
+           :added-content      "new"
            :syntax-highlight-p nil)))
     (test-assert
      (equal (mapcar #'test-row-text rows)
@@ -87,7 +87,7 @@
      "unknown coordinates number the documents from their first line"))
   (let ((rows
           (render-diff
-           :removed-content (format nil "keep~%drop")
+           :removed-content    (format nil "keep~%drop")
            :removed-start-line 100
            :syntax-highlight-p nil)))
     (test-assert
@@ -106,17 +106,17 @@
            (format nil "before~C~%new~C~%after~C~%"
                    #\Return #\Return #\Return)
            :removed-start-line 1
-           :added-start-line 1
+           :added-start-line   1
            :syntax-highlight-p nil))
         (trailing
           (render-diff
-           :added-content (format nil "first~%~%")
-           :added-start-line 1
+           :added-content      (format nil "first~%~%")
+           :added-start-line   1
            :syntax-highlight-p nil))
         (newline-only
           (render-diff
-           :added-content (string #\Newline)
-           :added-start-line 1
+           :added-content      (string #\Newline)
+           :added-start-line   1
            :syntax-highlight-p nil)))
     (test-assert
      (equal (mapcar #'test-row-text crlf)
@@ -135,8 +135,8 @@
   "Test equal before-and-after documents report no textual change."
   (let ((rows
           (render-diff
-           :removed-content (format nil "same~%")
-           :added-content (format nil "same~%")
+           :removed-content    (format nil "same~%")
+           :added-content      (format nil "same~%")
            :syntax-highlight-p nil)))
     (test-assert
      (and (= 1 (length rows))
@@ -147,11 +147,11 @@
   "Test independent removed and added line bounds and elisions."
   (let ((rows
           (render-diff
-           :removed-content (format nil "a~%b~%c~%d")
-           :added-content (format nil "w~%x~%y~%z")
+           :removed-content    (format nil "a~%b~%c~%d")
+           :added-content      (format nil "w~%x~%y~%z")
            :removed-start-line 1
-           :added-start-line 1
-           :line-limit 2
+           :added-start-line   1
+           :line-limit         2
            :syntax-highlight-p nil)))
     (test-assert
      (equal (mapcar #'test-row-text rows)
@@ -174,18 +174,18 @@
          (unsafe (format nil "~C[31mred~C[0m" escape escape))
          (safe-rows
            (render-diff
-            :added-content unsafe
+            :added-content      unsafe
             :syntax-highlight-p nil))
          (control-change
            (render-diff
-            :removed-content "red"
-            :added-content unsafe
+            :removed-content    "red"
+            :added-content      unsafe
             :syntax-highlight-p nil))
          (custom-rows
            (render-diff
-            :added-content (format nil "one~%two")
-            :added-start-line 1
-            :syntax-highlight-p nil
+            :added-content          (format nil "one~%two")
+            :added-start-line       1
+            :syntax-highlight-p     nil
             :sanitize-line-function #'string-upcase)))
     (test-assert
      (string= "+ 1 │ \\e[31mred\\e[0m"
@@ -204,19 +204,19 @@
   (let ((highlighted
           (render-diff
            :removed-content "(defun old-answer () 41)"
-           :added-content "(defun new-answer () 42)"
-           :source-path "answer.lisp"))
+           :added-content   "(defun new-answer () 42)"
+           :source-path     "answer.lisp"))
         (disabled
           (render-diff
-           :removed-content "(defun old-answer () 41)"
-           :added-content "(defun new-answer () 42)"
-           :source-path "missing/never-opened.lisp"
+           :removed-content    "(defun old-answer () 41)"
+           :added-content      "(defun new-answer () 42)"
+           :source-path        "missing/never-opened.lisp"
            :syntax-highlight-p nil))
         (unknown
           (render-diff
            :removed-content "old plain"
-           :added-content "new plain"
-           :source-path "answer.unknown")))
+           :added-content   "new plain"
+           :source-path     "answer.unknown")))
     (test-assert
      (and (test-rows-contain-role-p highlighted ':syntax-keyword)
           (test-rows-contain-role-p highlighted ':syntax-function)
@@ -307,10 +307,10 @@
   "Test applications can receive their own span representation directly."
   (let ((rows
           (render-diff
-           :removed-content "old"
-           :added-content "new"
+           :removed-content    "old"
+           :added-content      "new"
            :syntax-highlight-p nil
-           :span-function #'cons)))
+           :span-function      #'cons)))
     (test-assert
      (equal rows
             '(((:removed-gutter . "- 1 │ ") (:code . "old"))
@@ -321,13 +321,13 @@
   "Test plain, colored, and terminal-safe serialization."
   (let* ((rows
            (render-diff
-            :removed-content "old"
-            :added-content "new"
+            :removed-content    "old"
+            :added-content      "new"
             :syntax-highlight-p nil))
-         (plain (ansi-string rows :color-level ':none))
+         (plain   (ansi-string rows :color-level ':none))
          (colored (ansi-string rows :color-level ':basic))
-         (escape (code-char 27))
-         (bell (code-char 7))
+         (escape  (code-char 27))
+         (bell    (code-char 7))
          (payload
            (format nil
                    "~C]52;c;secret~C~C]8;;https://example.invalid~Clink~C]8;;~C~C[31mred~%next"

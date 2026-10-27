@@ -39,7 +39,7 @@ The result uses the same row representation as RENDER-DIFF."
   (check-type prompt (or null string))
   (check-type sanitize-line-function function)
   (check-type span-function function)
-  (let* ((lines (colordiff--source-lines content sanitize-line-function))
+  (let* ((lines         (colordiff--source-lines content sanitize-line-function))
          (highlighted
            (and syntax-highlight-p
                 (plusp (length lines))

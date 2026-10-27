@@ -39,7 +39,7 @@ spans built directly or returned by the standalone syntax helpers."
   (dolist (row rows)
     (dolist (span row)
       (check-type span span)
-      (let* ((style (rest (assoc (span-role span) style-table)))
+      (let* ((style     (rest (assoc (span-role span) style-table)))
              (safe-text (funcall sanitize-text-function (span-text span))))
         (check-type safe-text string)
         (write-string
@@ -57,7 +57,7 @@ spans built directly or returned by the standalone syntax helpers."
   "Return semantic ROWS as one safely ANSI-rendered string."
   (with-output-to-string (stream)
     (write-ansi rows
-                :stream stream
-                :style-table style-table
-                :color-level color-level
+                :stream                 stream
+                :style-table            style-table
+                :color-level            color-level
                 :sanitize-text-function sanitize-text-function)))

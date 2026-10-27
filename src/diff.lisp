@@ -20,14 +20,20 @@ OLD-START-LINE and NEW-START-LINE number the first line of each side."
   "Return one numbered context, removed, or added row with a semantic gutter."
   (let* ((gutter-role
            (ecase kind
-             (:context ':context-gutter)
-             (:removed ':removed-gutter)
-             (:added ':added-gutter)))
+             (:context
+              ':context-gutter)
+             (:removed
+              ':removed-gutter)
+             (:added
+              ':added-gutter)))
          (marker
            (ecase kind
-             (:context " ")
-             (:removed "-")
-             (:added "+")))
+             (:context
+              " ")
+             (:removed
+              "-")
+             (:added
+              "+")))
          (gutter
            (format nil "~A ~A │ "
                    marker
@@ -58,10 +64,12 @@ OLD-START-LINE and NEW-START-LINE number the first line of each side."
      &key start-line (width 1) highlighted-lines (limit 8))
   "Return bounded numbered changed LINES of KIND."
   (let* ((visible-count (min limit (length lines)))
-         (omitted (- (length lines) visible-count))
-         (noun (ecase kind
-                 (:removed "removed")
-                 (:added "added"))))
+         (omitted       (- (length lines) visible-count))
+         (noun          (ecase kind
+                          (:removed
+                           "removed")
+                          (:added
+                           "added"))))
     (append
      (loop for index below visible-count
            for line-number = (+ start-line index)
@@ -69,19 +77,19 @@ OLD-START-LINE and NEW-START-LINE number the first line of each side."
                     kind
                     (aref lines index)
                     span-function
-                    :width width
-                    :line-number line-number
+                    :width         width
+                    :line-number   line-number
                     :content-spans (and highlighted-lines
                                         (aref highlighted-lines index))))
      (when (plusp omitted)
        (let* ((line-number (+ start-line visible-count))
-              (message (format nil "… +~D more ~A line~:P" omitted noun)))
+              (message     (format nil "… +~D more ~A line~:P" omitted noun)))
          (list
           (colordiff--line-row
            kind
            message
            span-function
-           :width width
+           :width       width
            :line-number line-number
            :content-spans
            (list (funcall span-function ':elision message)))))))))
@@ -122,8 +130,8 @@ middle change block after removing the common prefix and suffix."
            (or added-start-line removed-start-line 1))
          (old-source (or removed-content ""))
          (new-source (or added-content ""))
-         (old-lines (colordiff--split-lines old-source))
-         (new-lines (colordiff--split-lines new-source))
+         (old-lines  (colordiff--split-lines old-source))
+         (new-lines  (colordiff--split-lines new-source))
          (old-display-lines
            (colordiff--prepare-lines old-source sanitize-line-function))
          (new-display-lines
@@ -133,16 +141,16 @@ middle change block after removing the common prefix and suffix."
                 (plusp (length old-display-lines))
                 (highlight-lines
                  (colordiff--lines-source old-display-lines)
-                 :language syntax-language
-                 :pathname source-path
+                 :language      syntax-language
+                 :pathname      source-path
                  :span-function span-function)))
          (new-highlighted
            (and syntax-highlight-p
                 (plusp (length new-display-lines))
                 (highlight-lines
                  (colordiff--lines-source new-display-lines)
-                 :language syntax-language
-                 :pathname source-path
+                 :language      syntax-language
+                 :pathname      source-path
                  :span-function span-function)))
          (prefix-length
            (colordiff--common-prefix-length old-lines new-lines))
@@ -161,9 +169,9 @@ middle change block after removing the common prefix and suffix."
         (let ((removed (subseq old-display-lines
                                prefix-length
                                (- (length old-lines) suffix-length)))
-              (added (subseq new-display-lines
-                             prefix-length
-                             (- (length new-lines) suffix-length))))
+              (added   (subseq new-display-lines
+                               prefix-length
+                               (- (length new-lines) suffix-length))))
           (append
            (when (plusp prefix-length)
              (list
@@ -171,7 +179,7 @@ middle change block after removing the common prefix and suffix."
                ':context
                (aref old-display-lines (1- prefix-length))
                span-function
-               :width width
+               :width       width
                :line-number (+ effective-added-start prefix-length -1)
                :content-spans
                (or (and new-highlighted
@@ -183,32 +191,32 @@ middle change block after removing the common prefix and suffix."
             ':removed
             span-function
             :start-line (+ effective-removed-start prefix-length)
-            :width width
+            :width      width
             :highlighted-lines
             (and old-highlighted
                  (subseq old-highlighted
                          prefix-length
                          (- (length old-lines) suffix-length)))
-            :limit line-limit)
+            :limit      line-limit)
            (colordiff--block-rows
             added
             ':added
             span-function
             :start-line (+ effective-added-start prefix-length)
-            :width width
+            :width      width
             :highlighted-lines
             (and new-highlighted
                  (subseq new-highlighted
                          prefix-length
                          (- (length new-lines) suffix-length)))
-            :limit line-limit)
+            :limit      line-limit)
            (when (plusp suffix-length)
              (list
               (colordiff--line-row
                ':context
                (aref old-display-lines (- (length old-lines) suffix-length))
                span-function
-               :width width
+               :width       width
                :line-number (+ effective-added-start
                                (- (length new-lines) suffix-length))
                :content-spans

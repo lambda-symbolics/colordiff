@@ -43,8 +43,8 @@
   (check-type content string)
   (if (zerop (length content))
       #()
-      (let ((lines nil)
-            (start 0)
+      (let ((lines  nil)
+            (start  0)
             (length (length content)))
         (loop
           for newline = (position #\Newline content :start start)

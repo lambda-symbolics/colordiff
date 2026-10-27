@@ -5,17 +5,28 @@
 (defun colordiff--syntax-role (category)
   "Map one ColorLisp CATEGORY to a stable semantic span role."
   (case category
-    (:comment ':syntax-comment)
-    ((:keyword :macro) ':syntax-keyword)
-    (:string ':syntax-string)
-    ((:escape :special) ':syntax-escape)
-    ((:number :constant) ':syntax-number)
-    ((:type :namespace :builtin) ':syntax-type)
-    ((:function :method) ':syntax-function)
-    ((:property :attribute) ':syntax-property)
-    (:heading ':syntax-heading)
-    (:link ':syntax-link)
-    (otherwise ':plain)))
+    (:comment
+     ':syntax-comment)
+    ((:keyword :macro)
+     ':syntax-keyword)
+    (:string
+     ':syntax-string)
+    ((:escape :special)
+     ':syntax-escape)
+    ((:number :constant)
+     ':syntax-number)
+    ((:type :namespace :builtin)
+     ':syntax-type)
+    ((:function :method)
+     ':syntax-function)
+    ((:property :attribute)
+     ':syntax-property)
+    (:heading
+     ':syntax-heading)
+    (:link
+     ':syntax-link)
+    (otherwise
+     ':plain)))
 
 (defun colordiff--highlight-segments (source language pathname)
   "Return ColorLisp segments for SOURCE, or NIL without a language."
@@ -47,7 +58,7 @@ styled-span representation."
 
 (defun colordiff--segments->lines (segments span-function)
   "Convert ColorLisp SEGMENTS into a vector of styled rows."
-  (let ((rows nil)
+  (let ((rows    nil)
         (current nil))
     (labels ((emit (role text start end)
                "Append TEXT between START and END to the current row."
@@ -60,8 +71,8 @@ styled-span representation."
                (push (nreverse current) rows)
                (setf current nil)))
       (dolist (segment segments)
-        (let ((text (segment-text segment))
-              (role (colordiff--syntax-role (segment-category segment)))
+        (let ((text  (segment-text segment))
+              (role  (colordiff--syntax-role (segment-category segment)))
               (start 0))
           (loop for newline = (position #\Newline text :start start)
                 while newline

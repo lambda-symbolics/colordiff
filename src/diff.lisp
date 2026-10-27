@@ -3,8 +3,9 @@
 ;;;; -- Bounded Endpoint Diffs --
 
 (defun colordiff--line-number-width
-    (old-lines new-lines old-start-line new-start-line)
-  "Return the display width needed for OLD-LINES and NEW-LINES numbers."
+    (old-lines new-lines &key (old-start-line 1) (new-start-line 1))
+  "Return the display width needed for OLD-LINES and NEW-LINES numbers.
+OLD-START-LINE and NEW-START-LINE number the first line of each side."
   (let ((largest
           (max (+ old-start-line (max 0 (1- (length old-lines))))
                (+ new-start-line (max 0 (1- (length new-lines)))))))
@@ -150,7 +151,10 @@ middle change block after removing the common prefix and suffix."
             old-lines new-lines prefix-length))
          (width
            (colordiff--line-number-width
-            old-lines new-lines effective-removed-start effective-added-start)))
+            old-lines
+            new-lines
+            :old-start-line effective-removed-start
+            :new-start-line effective-added-start)))
     (if (and (= prefix-length (length old-lines))
              (= prefix-length (length new-lines)))
         (list (list (funcall span-function ':context "no textual change")))

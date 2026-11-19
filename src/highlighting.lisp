@@ -29,7 +29,7 @@
      ':plain)))
 
 (defun colordiff--highlight-segments (source language pathname)
-  "Return ColorLisp segments for SOURCE, or NIL without a language."
+  "Return ColorLisp segments for SOURCE, or NIL."
   (handler-case
       (let ((resolved (or language
                           (and pathname
@@ -40,7 +40,7 @@
 
 (defun highlight-spans
     (source &key language pathname (span-function #'make-span))
-  "Return SOURCE as syntax-highlighted spans, or NIL without a language.
+  "Return SOURCE as syntax-highlighted spans, or NIL.
 
 PATHNAME is classification metadata and is never opened. SPAN-FUNCTION receives
 one semantic role and one text fragment, allowing callers to use their own

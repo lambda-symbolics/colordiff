@@ -114,9 +114,7 @@ coordinates, and when both are absent the documents number from their own
 first line.
 
 The result is a list of rows. Each row is a list of values produced by
-SPAN-FUNCTION from a semantic role and display text. This is an endpoint viewer,
-not an LCS or patch generator: it retains one equal line around the single
-middle change block after removing the common prefix and suffix."
+SPAN-FUNCTION from a semantic role and display text."
   (check-type removed-content (or null string))
   (check-type added-content (or null string))
   (check-type removed-start-line (or null integer))
@@ -235,9 +233,12 @@ middle change block after removing the common prefix and suffix."
   "Return one numbered row of KIND for TEXT, as RENDER-DIFF builds it.
 
 KIND is :CONTEXT, :REMOVED or :ADDED. LINE-NUMBER is right aligned to WIDTH
-columns. CONTENT-SPANS, when supplied, replace the single span made from TEXT,
+columns.
+
+CONTENT-SPANS, when supplied, replace the single span made from TEXT,
 so a caller can place a styled message in a row that lines up with a diff.
-TEXT is display text and is not sanitized here; WRITE-ANSI sanitizes at the
+
+TEXT is display text and is not sanitized; WRITE-ANSI sanitizes the text at the
 terminal boundary."
   (check-type kind (member :context :removed :added))
   (check-type text string)

@@ -25,7 +25,7 @@
   nil)
 
 (defun test-row-text (row)
-  "Return the concatenated text carried by semantic ROW spans."
+  "Return the concatenated text that is carried by the semantic ROW spans."
   (with-output-to-string (stream)
     (dolist (span row)
       (write-string (span-text span) stream))))
@@ -38,7 +38,7 @@
            row))
 
 (defun test-rows-contain-role-p (rows role)
-  "Return true when any span in ROWS carries ROLE."
+  "Return true when any span in ROWS contains ROLE."
   (loop for row in rows
         thereis (find role row :key #'span-role)))
 
@@ -236,7 +236,7 @@
      "standalone syntax helpers expose span and row forms")))
 
 (defun test-line-row ()
-  "Test the exported row builder lines up with diff rows."
+  "Test that the exported row builder lines up with diff rows."
   (test-assert
    (equal (test-row-text (render-line-row ':removed "gone" 41 :width 3))
           "-  41 │ gone")
@@ -275,12 +275,12 @@
      (and (test-find-span ':source-gutter "│ " (first bounded))
           (test-find-span ':code "one" (first bounded))
           (test-find-span ':elision "… +1 more line" (third bounded)))
-     "source rows carry the source gutter, code, and elision roles")
+     "source rows contain the source gutter, code, and elision roles")
     (test-assert
      (and (equal (mapcar #'test-row-text prompted)
                  '("│ $ echo a" "│   echo b"))
           (test-find-span ':prompt "$ " (first prompted)))
-     "a prompt leads the first line and indents the following ones")
+     "the first line is lead by a prompt and the following lines are indented")
     (test-assert
      (and (null (render-source ""))
           (null (render-source (format nil "~%~%")))
@@ -304,7 +304,7 @@
      "LINE-LIMIT must be positive")))
 
 (defun test-custom-span-function ()
-  "Test applications can receive their own span representation directly."
+  "Test that applications can receive their own span representation directly."
   (let ((rows
           (render-diff
            :removed-content    "old"
@@ -363,7 +363,7 @@
      "standalone highlighted spans cannot bypass terminal sanitization")))
 
 (defun test-invalid-bound ()
-  "Test a nonpositive line limit is rejected."
+  "Test that a nonpositive line limit is rejected."
   (test-assert
    (handler-case
        (progn

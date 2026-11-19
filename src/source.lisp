@@ -12,7 +12,7 @@
     (subseq lines 0 end)))
 
 (defun colordiff--source-row (spans span-function)
-  "Return one source row holding SPANS behind the source gutter."
+  "Return one source row containing SPANS behind the source gutter."
   (cons (funcall span-function ':source-gutter "│ ") spans))
 
 (defun render-source
@@ -26,12 +26,15 @@
   "Render CONTENT as a bounded, unnumbered source preview under one gutter.
 
 Trailing blank lines are not shown. At most LINE-LIMIT lines are rendered; the
-rest are summarized by one elision row. SOURCE-PATH, SYNTAX-LANGUAGE and
-SYNTAX-HIGHLIGHT-P select highlighting exactly as in RENDER-DIFF.
+rest are summarized by one elision row.
+
+SOURCE-PATH, SYNTAX-LANGUAGE and SYNTAX-HIGHLIGHT-P select highlighting exactly
+the same way as in RENDER-DIFF.
 
 PROMPT, when supplied, is shown before the first line in the :PROMPT role and
-later lines are indented by its width, as in a shell transcript. Empty CONTENT
-renders no rows, or a single prompt row when PROMPT is supplied.
+later lines are indented by its width, as in a shell transcript.
+
+Empty CONTENT does not render any rows, or a single prompt row when PROMPT is supplied.
 
 The result uses the same row representation as RENDER-DIFF."
   (check-type content string)

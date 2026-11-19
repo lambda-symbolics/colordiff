@@ -12,7 +12,7 @@
 
 (defstruct (span
             (:constructor make-span (role text)))
-  "One text fragment carrying a semantic rendering role."
+  "One text fragment associated with a semantic rendering role."
   (role ':plain :type span-role :read-only t)
   (text "" :type string :read-only t))
 

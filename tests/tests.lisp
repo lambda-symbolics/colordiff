@@ -373,6 +373,47 @@
        t))
    "LINE-LIMIT must be positive"))
 
+(defun test-highlight-span-role-overlay ()
+  "Test role replacement within a syntax token, before span construction."
+  (let* ((source "(list 123)")
+         (spans  (highlight-spans source :pathname "form.lisp" :span-function #'cons
+                                  :role-overlay-function
+                                  (lambda (text)
+                                    (test-assert (string= text source) "overlay receives the source")
+                                    #(nil nil nil nil nil nil nil :mark :mark nil)))))
+    (test-assert (equal (remove-if-not (lambda (span) (eq (first span) ':mark)) spans)
+                        '((:mark . "23")))
+                 "adjacent overrides group within the same token")
+    (test-assert (and (member '(:syntax-number . "1") spans :test #'equal)
+                      (string= source (format nil "~{~A~}" (mapcar #'rest spans))))
+                 "unmarked text and the rest of its syntax role are preserved")))
+
+(defun test-source-role-overlay ()
+  "Test source-only offsets through sanitation, newlines and preview layout."
+  (dolist (syntax-highlight-p '(nil t))
+    (let* ((inputs nil)
+           (rows   (render-source (format nil "\"a~C~C~%b\"~%hidden~%~%" #\Tab #\Return)
+                                  :source-path        "form.lisp"
+                                  :syntax-highlight-p syntax-highlight-p
+                                  :line-limit         2
+                                  :prompt             "b "
+                                  :span-function      #'cons
+                                  :role-overlay-function
+                                  (lambda (text)
+                                    (push text inputs)
+                                    #(nil nil nil :mark :mark :mark nil)))))
+      (test-assert (equal inputs (list (format nil "\"a\\t~%b\"")))
+                   "preview overlay sees sanitized, visible source only, with one LF")
+      (test-assert (equal (mapcar (lambda (row)
+                                   (remove-if-not (lambda (span) (eq ':mark (first span))) row))
+                                rows)
+                          '(((:mark . "t")) ((:mark . "b")) nil))
+                   "source offsets address text only across line boundaries")
+      (test-assert (and (equal (subseq (first rows) 0 2) '((:source-gutter . "│ ") (:prompt . "b ")))
+                        (equal (subseq (second rows) 0 2) '((:source-gutter . "│ ") (:prompt . "  ")))
+                        (equal (third rows) '((:source-gutter . "│ ") (:elision . "… +1 more line"))))
+                   "preview layout roles are outside the overlay"))))
+
 (defun run-tests ()
   "Run all Colordiff tests and return NIL after success."
   (setf *test-count* 0)
@@ -389,6 +430,8 @@
           test-ansi-rendering
           test-invalid-bound
           test-line-row
-          test-source-preview))
+            test-source-preview
+            test-highlight-span-role-overlay
+            test-source-role-overlay))
   (format t "~&~D Colordiff tests passed.~%" *test-count*)
   nil)

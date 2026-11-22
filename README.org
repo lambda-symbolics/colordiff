@@ -81,6 +81,12 @@ its own terminal-safety policy before highlighting and layout.
 =HIGHLIGHT-SPANS= and =HIGHLIGHT-LINES= expose the same style-neutral ColorLisp
 mapping for callers that need syntax rendering outside a diff.
 
+=HIGHLIGHT-SPANS= and =RENDER-SOURCE= accept a =:ROLE-OVERLAY-FUNCTION=
+that receives source text and returns one vector entry per character. =NIL=
+entries keep the syntax or code role. Other entries replace it before
+=SPAN-FUNCTION= runs. In previews, the input is the visible source after line
+sanitization, with LF between lines and no display decorations.
+
 * ANSI output
 
 =WRITE-ANSI= writes semantic rows to a stream. =ANSI-STRING= returns the same
